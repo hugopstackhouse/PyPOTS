@@ -40,6 +40,9 @@ class BRITS(BaseNNImputer):
     epochs :
         The number of epochs for training the model.
 
+    use_BRITSI:
+        use the BRITSI assumption (no correlation between features at the same time)
+
     patience :
         The patience for the early-stopping mechanism. Given a positive integer, the training process will be
         stopped when the model does not perform better after that number of epochs.
@@ -84,6 +87,7 @@ class BRITS(BaseNNImputer):
         rnn_hidden_size: int,
         batch_size: int = 32,
         epochs: int = 100,
+        use_BRITSI: Optional[int] = False,
         patience: Optional[int] = None,
         optimizer: Optional[Optimizer] = Adam(),
         num_workers: int = 0,
@@ -106,12 +110,14 @@ class BRITS(BaseNNImputer):
         self.n_steps = n_steps
         self.n_features = n_features
         self.rnn_hidden_size = rnn_hidden_size
+        self.use_BRITSI = use_BRITSI
 
         # set up the model
         self.model = _BRITS(
             self.n_steps,
             self.n_features,
             self.rnn_hidden_size,
+            self.use_BRITSI
         )
         self._send_model_to_given_device()
         self._print_model_size()

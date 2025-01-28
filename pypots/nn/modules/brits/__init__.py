@@ -17,11 +17,13 @@ The bugs in the original implementation are fixed here.
 # Created by Wenjie Du <wenjay.du@gmail.com>
 # License: BSD-3-Clause
 
-from .backbone import BackboneRITS, BackboneBRITS
+from .backbone import BackboneRITS, BackboneRITSI, BackboneBRITS, BackboneBRITSI
 from .layers import FeatureRegression
 
 __all__ = [
     "BackboneRITS",
+    "BackboneRITSI",
     "BackboneBRITS",
+    "BackboneBRITSI",
     "FeatureRegression",
 ]

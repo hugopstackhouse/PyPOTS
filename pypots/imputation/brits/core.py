@@ -6,9 +6,11 @@ and takes over the forward progress of the algorithm.
 # Created by Wenjie Du <wenjay.du@gmail.com>
 # License: BSD-3-Clause
 
+from typing import Optional
+
 import torch.nn as nn
 
-from ...nn.modules.brits import BackboneBRITS
+from ...nn.modules.brits import BackboneBRITS, BackboneBRITSI
 
 
 class _BRITS(nn.Module):
@@ -26,6 +28,9 @@ class _BRITS(nn.Module):
     rnn_hidden_size :
         the hidden size of the RNN cell
 
+    use_BRITSI:
+        use the BRITSI assumption (no correlation between features at the same time)
+
     """
 
     def __init__(
@@ -33,13 +38,17 @@ class _BRITS(nn.Module):
         n_steps: int,
         n_features: int,
         rnn_hidden_size: int,
+        use_BRITSI: Optional[int] = False
     ):
         super().__init__()
         self.n_steps = n_steps
         self.n_features = n_features
         self.rnn_hidden_size = rnn_hidden_size
 
-        self.model = BackboneBRITS(n_steps, n_features, rnn_hidden_size)
+        if use_BRITSI:
+            self.model = BackboneBRITSI(n_steps, n_features, rnn_hidden_size)
+        else:
+            self.model = BackboneBRITS(n_steps, n_features, rnn_hidden_size)
 
     def forward(self, inputs: dict, training: bool = True) -> dict:
         (
