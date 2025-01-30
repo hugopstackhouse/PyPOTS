@@ -94,7 +94,6 @@ X_train_3D = X_train.reshape(X_train.shape[0], X_train.shape[1], 1)
 X_test_3D =  X_test.reshape(X_test.shape[0], X_test.shape[1], 1)
 y_train_3D = y_train
 y_test_3D = y_test
-n_steps = len(X_test_3D[0])
 
 # stack for resampling
 Xs = np.vstack([X_train_3D, X_test_3D])
@@ -115,39 +114,8 @@ with open("../Folds/IPD/ipd_windows_python_idx.json", "r") as f:
 window_idxs = {int(float(k)*100): v for k, v in window_idxs_f.items()}
 # print(window_idxs.keys())
 
-train_f = np.loadtxt("../Folds/ECG200/ECG200_TRAIN.txt")
-test_f = np.loadtxt("../Folds/ECG200/ECG200_TEST.txt")
-X_train = train_f[:, 1:]
-y_train = train_f[:, 0]
-X_test = test_f[:, 1:]
-y_test = test_f[:, 0]
 
-# reshape data because pypots wants multivariate
-X_train_3D = X_train.reshape(X_train.shape[0], X_train.shape[1], 1)
-X_test_3D =  X_test.reshape(X_test.shape[0], X_test.shape[1], 1)
-y_train_3D = y_train
-y_test_3D = y_test
 n_steps = len(X_test_3D[0])
-
-# stack for resampling
-Xs_ecg = np.vstack([X_train_3D, X_test_3D])
-print(Xs_ecg.shape)
-ys_ecg = np.concatenate([y_train_3D, y_test_3D])
-print(ys_ecg.shape)
-
-# load resample fold indices
-with open("../Folds/ECG200/resample_folds_python_idx.json", "r") as f:
-    resample_fold_idxs_f = json.load(f)
-resample_fold_idxs_ecg = {int(k): v for k, v in resample_fold_idxs_f.items()}
-
-# load imputation window indices
-with open("../Folds/ECG200/windows_python_idx.json", "r") as f:
-    window_idxs_f = json.load(f)
-window_idxs_ecg = {int(float(k)*100): v for k, v in window_idxs_f.items()}
-# print(window_idxs.keys())
-
-
-
 n_features = 1
 rnn_hidden_size=128
 batch_size=32
@@ -171,24 +139,15 @@ britsi = BRITS(
 )
 
 # # fold_scores_brits = evaluate_folds(brits, 3, Xs, ys, resample_fold_idxs, [range(5,15)])
-# fold_scores_britsi = evaluate_folds(britsi, 30, Xs, ys, resample_fold_idxs, window_idxs)
+fold_scores_britsi = evaluate_folds(britsi, 30, Xs, ys, resample_fold_idxs, window_idxs)
 
 
-# # print("IPD BRITS Mean MAE: {}".format(np.mean(fold_scores_brits)))
-# print("IPD BRITS-I Mean MAE:")
-# for pm in window_idxs:
-#     print(f"{pm}%:", np.mean(fold_scores_britsi[pm]))
-
-# # fold_scores_britsi = {5:10, 10:20}
-# with open("IPD_britsi_results.pkl", "wb") as f:
-#     pickle.dump(fold_scores_britsi, f)
-
-
-fold_scores_britsi_ecg = evaluate_folds(britsi, 30, Xs_ecg, ys_ecg, resample_fold_idxs_ecg, window_idxs_ecg)
-print("ECG BRITS-I Mean MAE:")
+# print("IPD BRITS Mean MAE: {}".format(np.mean(fold_scores_brits)))
+print("IPD BRITS-I Mean MAE:")
 for pm in window_idxs:
-    print(f"{pm}%:", np.mean(fold_scores_britsi_ecg[pm]))
+    print(f"{pm}%:", np.mean(fold_scores_britsi[pm]))
 
 # fold_scores_britsi = {5:10, 10:20}
-with open("ECG_britsi_results.pkl", "wb") as f:
-    pickle.dump(fold_scores_britsi_ecg, f)
+with open("IPD_britsi_results.pkl", "wb") as f:
+    pickle.dump(fold_scores_britsi, f)
+
